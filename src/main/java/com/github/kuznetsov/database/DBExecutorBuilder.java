@@ -4,6 +4,7 @@ import com.github.kuznetsov.database.configs.DBConfig;
 import com.github.kuznetsov.database.configs.DBMySQLConfig;
 import com.github.kuznetsov.database.exceptions.DBExecutorBuildException;
 import com.github.kuznetsov.tcp.TCPIncorrectPortException;
+import java.sql.SQLException;
 
 /**
  *
@@ -29,6 +30,11 @@ public class DBExecutorBuilder {
         return this;
     }
     
+    public DBExecutorBuilder setHost(String host) {
+        config.setHost(host);
+        return this;
+    }
+    
     public DBExecutorBuilder setPort(int port) throws TCPIncorrectPortException {
         config.setPort(port);
         return this;
@@ -49,7 +55,17 @@ public class DBExecutorBuilder {
         return this;
     }
     
-    public DBExecutor build() throws DBExecutorBuildException {
+    public DBExecutorBuilder setAutoconnect(boolean autoconnect) {
+        config.setAutoconnect(autoconnect);
+        return this;
+    }
+    
+    public DBExecutorBuilder setForceConnect(boolean forceConnect) {
+        config.setForceConnect(forceConnect);
+        return this;
+    }
+    
+    public DBExecutor build() throws DBExecutorBuildException, ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
         if (config.isConfigReady()) {
             return new DBExecutor(config);
         } else {

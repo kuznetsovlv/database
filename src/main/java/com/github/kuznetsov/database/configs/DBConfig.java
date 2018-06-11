@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,6 +16,7 @@ public class DBConfig {
     private static final String PORT = "port";
     private static final String DRIVER_NAME = "driverName";
     private static final String PROTOCOL = "protocol";
+    private static final String HOST = "host";
     private static final String DB_NAME = "dataBaseName";
     private static final String DESCRIPTION = "description";
     private static final String USER_NAME = "userName";
@@ -26,10 +25,14 @@ public class DBConfig {
     private TCPPort port;
     private String driverName;
     private String protocol;
+    private String host;
     private String dataBaseName;
     private String description;
     private String userName;
     private String password;
+    private boolean autoconnect;
+    private boolean forceConnect;
+    
     private final Map<String, Object> properties;
     private final DBTypes type;
 
@@ -87,6 +90,15 @@ public class DBConfig {
     public String getProcol() {
         return protocol;
     }
+    
+    public DBConfig setHost(String host) {
+        this.host = host;
+        return this;
+    }
+    
+    public String getHost() {
+        return host;
+    }
 
     public DBConfig setDataBaseName (String dataBaseName) {
         this.dataBaseName = dataBaseName;
@@ -137,6 +149,8 @@ public class DBConfig {
                     return setDriverName(value.toString());
                 case PROTOCOL:
                     return setProtocol(value.toString());
+                case HOST:
+                    return setHost(value.toString());
                 case DB_NAME:
                     return setDataBaseName(value.toString());
                 case DESCRIPTION:
@@ -164,6 +178,8 @@ public class DBConfig {
                 return getDriverName();
             case PROTOCOL:
                 return getProcol();
+            case HOST:
+                return getHost();
             case DB_NAME:
                 return getDataBaseName();
             case DESCRIPTION:
@@ -176,9 +192,43 @@ public class DBConfig {
 
         return properties.get(key);
     }
+    
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+    
+    public DBConfig setAutoconnect(boolean autoconnect) {
+        this.autoconnect = autoconnect;
+        return this;
+    }
+    
+    public boolean getAutoconnect() {
+        return autoconnect;
+    }
+    
+    public DBConfig setForceConnect(boolean forceConnect) {
+        this.forceConnect = forceConnect;
+        if (forceConnect) {
+            return setAutoconnect(true);
+        }
+        return this;
+    }
+    
+    public boolean getForceconnect() {
+        return forceConnect;
+    }
 
     private String[] getNecessary() {
-        return new String[]{ PORT, DRIVER_NAME, PROTOCOL, DB_NAME, DESCRIPTION, USER_NAME, PASSWORD };
+        return new String[]{
+            PORT,
+            DRIVER_NAME,
+            PROTOCOL,
+            HOST,
+            DB_NAME,
+            DESCRIPTION,
+            USER_NAME,
+            PASSWORD
+        };
     }
 
     public boolean isConfigReady() {

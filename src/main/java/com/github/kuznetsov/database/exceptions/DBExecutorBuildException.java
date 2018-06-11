@@ -9,6 +9,11 @@ import java.util.List;
 public class DBExecutorBuildException extends Exception{
     private final List<String> unconfigurated;
 
+    public DBExecutorBuildException(Throwable throwable) {
+        super("Cannot build executor with unknown reason.", throwable);
+        this.unconfigurated = null;
+    }
+
     public DBExecutorBuildException(List<String> unconfigurated) {
         super("Cannot build executor because some fields are not configured.");
         this.unconfigurated = unconfigurated;
