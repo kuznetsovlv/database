@@ -1,17 +1,20 @@
-package com.github.kuznetsov.database;
+package com.github.kuznetsov.database.configs;
 
-import com.github.kuznetsov.database.range.Range;
+import com.github.kuznetsov.database.DBTypes;
+import com.github.kuznetsov.tcp.TCPIncorrectPortException;
+import com.github.kuznetsov.tcp.TCPPort;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author leonid
  */
-class DBConfig {
-    
-    private static final Range availablePorts = new Range(0, 65535);
-   
+public class DBConfig {   
     private static final String PORT = "port";
     private static final String DRIVER_NAME = "driverName";
     private static final String PROTOCOL = "protocol";
@@ -20,7 +23,7 @@ class DBConfig {
     private static final String USER_NAME = "userName";
     private static final String PASSWORD = "password";
    
-    private int port;
+    private TCPPort port;
     private String driverName;
     private String protocol;
     private String dataBaseName;
@@ -32,21 +35,39 @@ class DBConfig {
 
     public DBConfig(DBTypes type) {
         this.properties = new HashMap<>();
-        this.port = type.getDefaultPort();
         this.type = type;
+        
+        try {
+            this.port = new TCPPort(type.getDefaultPort());
+        } catch (TCPIncorrectPortException ex) {
+            this.port = null;
+        }
+        
+        this.driverName = type.getDriverName();
+        this.protocol = type.getProtocol();
+        this.description = type.getDescription();
     }
     
     public DBTypes getType() {
         return type;
     }
 
-    public DBConfig setPort(int port) {
+    public DBConfig setPort(int port) throws TCPIncorrectPortException {
+        this.port = new TCPPort(port);
+        return this;
+    }
+    
+    public DBConfig setPort(TCPPort port) {
         this.port = port;
         return this;
     }
 
-    public int getPort() {
+    public TCPPort getPort() {
         return port;
+    }
+    
+    public int getPortValue() {
+        return port.value();
     }
 
     public DBConfig setDriverName(String driverName) {
@@ -103,11 +124,15 @@ class DBConfig {
         return password;
     }
 
-    public DBConfig setProperty(String key, Object value) {
+    public DBConfig setProperty(String key, Object value) throws TCPIncorrectPortException {
         if(key != null) {
             switch (key) {
                 case PORT:
-                    return setPort(Integer.parseInt(value.toString()));
+                    if (value instanceof TCPPort) {
+                        return setPort((TCPPort) value);
+                    } else {
+                        return setPort(Integer.parseInt(value.toString()));
+                    }
                 case DRIVER_NAME:
                     return setDriverName(value.toString());
                 case PROTOCOL:
@@ -153,7 +178,7 @@ class DBConfig {
     }
 
     private String[] getNecessary() {
-        return new String[]{ DRIVER_NAME, PROTOCOL, DB_NAME, DESCRIPTION, USER_NAME, PASSWORD };
+        return new String[]{ PORT, DRIVER_NAME, PROTOCOL, DB_NAME, DESCRIPTION, USER_NAME, PASSWORD };
     }
 
     public boolean isConfigReady() {
@@ -162,6 +187,18 @@ class DBConfig {
                 return false;
             }
         }
-        return availablePorts.inRange(getPort());
+        return true;
+    }
+    
+    public List<String> getNeads() {
+        List<String> neads = new ArrayList<>();
+        
+        for(String key: getNecessary()) {
+            if(getProperty(key) == null) {
+                neads.add(key);
+            }
+        }
+        
+        return neads;
     }
 }

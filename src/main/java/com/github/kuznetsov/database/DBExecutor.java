@@ -1,5 +1,7 @@
 package com.github.kuznetsov.database;
 
+import com.github.kuznetsov.database.connections.ConnectionFactory;
+import com.github.kuznetsov.database.configs.DBConfig;
 import java.sql.Connection;
 
 /**

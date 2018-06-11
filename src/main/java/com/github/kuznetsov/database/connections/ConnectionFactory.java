@@ -1,12 +1,13 @@
-package com.github.kuznetsov.database;
+package com.github.kuznetsov.database.connections;
 
+import com.github.kuznetsov.database.configs.DBConfig;
 import java.sql.Connection;
 
 /**
  *
  * @author leonid
  */
-class ConnectionFactory {
+public class ConnectionFactory {
     public static Connection createConnection(DBConfig config) {
         
         switch(config.getType()) {
