@@ -11,7 +11,7 @@ public class DBExecutorBuilder {
 
     public DBExecutorBuilder(DBTypes type) {
         this.type = type;
-        this.config = new DBConfig()
+        this.config = new DBConfig(type)
                 .setPort(type.getDefaultPort())
                 .setDriverName(type.getDriverName())
                 .setProtocol(type.getProtocol())

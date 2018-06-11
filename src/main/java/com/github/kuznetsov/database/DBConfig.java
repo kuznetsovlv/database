@@ -1,5 +1,6 @@
 package com.github.kuznetsov.database;
 
+import com.github.kuznetsov.database.range.Range;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,8 @@ import java.util.Map;
  * @author leonid
  */
 class DBConfig {
+    
+    private static final Range availablePorts = new Range(0, 65535);
    
     private static final String PORT = "port";
     private static final String DRIVER_NAME = "driverName";
@@ -25,10 +28,16 @@ class DBConfig {
     private String userName;
     private String password;
     private final Map<String, Object> properties;
+    private final DBTypes type;
 
-    public DBConfig() {
+    public DBConfig(DBTypes type) {
         this.properties = new HashMap<>();
-        this.port = -1;
+        this.port = type.getDefaultPort();
+        this.type = type;
+    }
+    
+    public DBTypes getType() {
+        return type;
     }
 
     public DBConfig setPort(int port) {
@@ -153,6 +162,6 @@ class DBConfig {
                 return false;
             }
         }
-        return getPort() > 0;
+        return availablePorts.inRange(getPort());
     }
 }
