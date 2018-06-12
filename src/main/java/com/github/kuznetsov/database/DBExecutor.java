@@ -103,37 +103,35 @@ public class DBExecutor implements AutoCloseable{
         }
     }
 
-    public int executeUpdate(String update) throws SQLException, DBUsingClosedExecutor {
+    public long executeUpdate(String update) throws SQLException, DBUsingClosedExecutor {
         if(!open) {
             throw new DBUsingClosedExecutor();
         }
         
         try(Statement statement = connection.createStatement()) {
-            return statement.executeUpdate(update);
+            return statement.executeLargeUpdate(update);
         } catch (SQLException ex) {
             throw ex;
         }
     }
     
-    public int executeUpdate(Collection<String> updates) throws SQLException, DBUsingClosedExecutor {
+    public long[] executeUpdate(Collection<String> updates) throws SQLException, DBUsingClosedExecutor {
         if(!open) {
             throw new DBUsingClosedExecutor();
         }
-        
-        int changes = 0;
-        
+       
         try {
             connection.setAutoCommit(false);
             
-            for(String update: updates) {
-                try(Statement statement = connection.createStatement()) {
-                    changes += statement.executeUpdate(update);
-                } catch (SQLException ex) {
-                    throw ex;
+            try(Statement statemen = connection.createStatement()) {
+                for(String update: updates) {
+                    statemen.addBatch(update);
                 }
+                
+                return statemen.executeLargeBatch();
+            } catch (SQLException ex) {
+                throw ex;
             }
-            
-            return changes;
         } catch (SQLException ex) {
             connection.rollback();
             throw ex;
@@ -142,7 +140,7 @@ public class DBExecutor implements AutoCloseable{
         }
     }
     
-    public <S> int executeUpdate (String update, S data, DBPreparedExecutor<S> executor) throws SQLException, DBUsingClosedExecutor {
+    public <S> long[] executeUpdate (String update, S data, DBPreparedExecutor<S> executor) throws SQLException, DBUsingClosedExecutor {
         if(!open) {
             throw new DBUsingClosedExecutor();
         }
@@ -152,5 +150,9 @@ public class DBExecutor implements AutoCloseable{
         } catch(SQLException ex) {
             throw ex;
         }
+    }
+    
+    public String getDescription() {
+        return description;
     }
 }
