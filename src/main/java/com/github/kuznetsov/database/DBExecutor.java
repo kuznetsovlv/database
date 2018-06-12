@@ -142,7 +142,7 @@ public class DBExecutor implements AutoCloseable{
         }
     }
     
-    public <S> int executeUpdate (String update, S data, DBPreparedExecutor<S> executor ) throws SQLException, DBUsingClosedExecutor {
+    public <S> int executeUpdate (String update, S data, DBPreparedExecutor<S> executor) throws SQLException, DBUsingClosedExecutor {
         if(!open) {
             throw new DBUsingClosedExecutor();
         }
