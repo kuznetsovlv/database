@@ -7,8 +7,6 @@ import com.github.kuznetsov.database.exceptions.DBUsingClosedExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -55,7 +53,11 @@ public class DBExecutor implements AutoCloseable{
             throw new DBUsingClosedExecutor();
         }
         
-        return connection.createStatement().executeUpdate("use " + dataBaseName);
+        try(Statement statment = connection.createStatement()) {
+            return statment.executeUpdate("use " + dataBaseName);
+        } catch (SQLException ex) {
+            throw ex;
+        }
     }
     
     public int createBase() throws DBUsingClosedExecutor, SQLException {
@@ -63,7 +65,11 @@ public class DBExecutor implements AutoCloseable{
             throw new DBUsingClosedExecutor();
         }
         
-        return connection.createStatement().executeUpdate("create database db");
+        try(Statement statment = connection.createStatement()) {
+            return statment.executeUpdate("create database " + dataBaseName);
+        } catch (SQLException ex) {
+            throw ex;
+        }
     }
 
     @Override
