@@ -5,7 +5,7 @@ package com.github.kuznetsov.database;
  * @author leonid
  */
 public enum DBTypes {
-    MySQL("com.mysql.jdbc.Driver", "jdbc:mysql", 3306, "MySQL data base")
+    MySQL("com.mysql.cj.jdbc.Driver", "jdbc:mysql", 3306, "MySQL data base")
     ;
     
     private final String driverName;
